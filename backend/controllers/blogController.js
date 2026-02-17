@@ -1,41 +1,57 @@
 const Blog = require("../models/Blog");
 
-// Create
-exports.createBlog = async (req, res) => {
-  try {
-    const blog = await Blog.create(req.body);
-    res.status(201).json(blog);
-  } catch (err) {
-    res.status(500).json({ msg: "Server error" });
-  }
-};
-
-// Read All
+// GET all blogs
 exports.getBlogs = async (req, res) => {
   try {
     const blogs = await Blog.find().sort({ createdAt: -1 });
     res.json(blogs);
-  } catch (err) {
-    res.status(500).json({ msg: "Server error" });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching blogs" });
   }
 };
 
-// Update
+// GET single blog
+exports.getBlogById = async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id);
+    if (!blog) return res.status(404).json({ message: "Blog not found" });
+    res.json(blog);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching blog" });
+  }
+};
+
+// CREATE blog
+exports.createBlog = async (req, res) => {
+  try {
+    const newBlog = new Blog(req.body);
+    await newBlog.save();
+    res.status(201).json(newBlog);
+  } catch (error) {
+    res.status(500).json({ message: "Error creating blog" });
+  }
+};
+
+// UPDATE blog
 exports.updateBlog = async (req, res) => {
   try {
-    const blog = await Blog.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(blog);
-  } catch (err) {
-    res.status(500).json({ msg: "Server error" });
+    const updated = await Blog.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating blog" });
   }
 };
 
-// Delete
+// DELETE blog
 exports.deleteBlog = async (req, res) => {
   try {
     await Blog.findByIdAndDelete(req.params.id);
-    res.json({ msg: "Blog deleted" });
-  } catch (err) {
-    res.status(500).json({ msg: "Server error" });
+    res.json({ message: "Blog deleted" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting blog" });
   }
 };

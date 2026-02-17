@@ -1,20 +1,32 @@
 const Education = require("../models/Education");
 
-exports.addEducation = async (req, res) => {
+// GET all education
+exports.getEducation = async (req, res) => {
   try {
-    const edu = await Education.create(req.body);
-    res.status(201).json(edu);
-  } catch (err) {
-    res.status(500).json({ msg: "Error adding education" });
+    const education = await Education.find().sort({ createdAt: -1 });
+    res.json(education);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 
-exports.getEducation = async (req, res) => {
-  const edu = await Education.find().sort({ createdAt: -1 });
-  res.json(edu);
+// CREATE education
+exports.createEducation = async (req, res) => {
+  try {
+    const newEducation = new Education(req.body);
+    const saved = await newEducation.save();
+    res.status(201).json(saved);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
+// DELETE education
 exports.deleteEducation = async (req, res) => {
-  await Education.findByIdAndDelete(req.params.id);
-  res.json({ msg: "Deleted" });
+  try {
+    await Education.findByIdAndDelete(req.params.id);
+    res.json({ message: "Education deleted" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
